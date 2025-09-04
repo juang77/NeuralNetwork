@@ -13,5 +13,11 @@ namespace NeuralNetwork.Abstration
         double[] Predict (double[] input);
 
         void Train(double[][] trainingData, double[][] targets, int epochs, double learningRate);
+
+        IEnumerable<NeuronInfo> GetNeuronInfo();
+        
+        void SaveModel(string filePath);
+
+        INeuralNetwork LoadModel(string filePath);
     }
 }

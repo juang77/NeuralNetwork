@@ -2,12 +2,12 @@
 
 public interface ISynapse
 {
-    void FeedInput(double value);
+    void ReceiveInputValue(double value);
 
     void SetWeightValue(double weight);
 
-    double value { get; }
-    double weight { get; }
+    double Value { get; }
+    double Weight { get; }
 
-    event Action<ISynapse> OnFeedInput;
+    event Action<ISynapse> OnInputValueReceived;
 }
