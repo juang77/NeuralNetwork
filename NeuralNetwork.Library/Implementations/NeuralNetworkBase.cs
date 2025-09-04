@@ -1,5 +1,7 @@
 ﻿using NeuralNetwork.Abstration;
+using NeuralNetwork.Library.Activation_Function;
 using NeuralNetwork.Library.Helpers;
+using NeuralNetwork.Library.InputFunctions;
 using NeuralNetwork.Library.Models;
 
 namespace NeuralNetwork.Library.Implementations
@@ -83,11 +85,11 @@ namespace NeuralNetwork.Library.Implementations
         protected IInputFunction InputLayerInputFunction { get; set; } = null;
         protected IActivationFunction InputLayerActivationFunction { get; set; } = null;
 
-        protected IInputFunction HiddenLayerInputFunction { get; set; } = null;
-        protected IActivationFunction HiddenLayerActivationFunction { get; set; } = null;
+        protected IInputFunction HiddenLayerInputFunction { get; set; } = new WeightedSumInputFunction();
+        protected IActivationFunction HiddenLayerActivationFunction { get; set; } = new HyperbolicTangentActivationFunction();
 
 
-        protected IInputFunction OutputLayerInputFunction { get; set; } = null;
+        protected IInputFunction OutputLayerInputFunction { get; set; } = new WeightedSumInputFunction();
         protected IActivationFunction OutputLayerActivationFunction { get; set; } = null;
 
         #endregion

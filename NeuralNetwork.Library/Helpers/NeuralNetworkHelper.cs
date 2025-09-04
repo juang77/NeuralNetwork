@@ -44,10 +44,6 @@ namespace NeuralNetwork.Library.Helpers
         {
             if (neuronsCount <= 0)
                 throw new ArgumentOutOfRangeException(nameof(neuronsCount), "The number of neurons must be greater than zero.");
-            if (inputFunction == null)
-                throw new ArgumentNullException(nameof(inputFunction));
-            if (activationFunction == null)
-                throw new ArgumentNullException(nameof(activationFunction));
 
             INeuron[] layer = new INeuron[neuronsCount];
 
@@ -70,10 +66,6 @@ namespace NeuralNetwork.Library.Helpers
         {
             if (neuronsCount <= 0)
                 throw new ArgumentOutOfRangeException(nameof(neuronsCount), "The number of neurons must be greater than zero.");
-            if (inputFunction == null)
-                throw new ArgumentNullException(nameof(inputFunction));
-            if (activationFunction == null)
-                throw new ArgumentNullException(nameof(activationFunction));
             if (previousLayer == null || previousLayer.Length == 0)
                 throw new ArgumentNullException(nameof(previousLayer), "The previous layer must not be null or empty.");
 
@@ -108,10 +100,6 @@ namespace NeuralNetwork.Library.Helpers
                 throw new ArgumentNullException(nameof(hiddenLayersNeuronsCount), "Hidden layers configuration must not be null or empty.");
             if (inputLayer == null || inputLayer.Length == 0)
                 throw new ArgumentNullException(nameof(inputLayer), "Input layer must not be null or empty.");
-            if (inputFunction == null)
-                throw new ArgumentNullException(nameof(inputFunction));
-            if (activationFunction == null)
-                throw new ArgumentNullException(nameof(activationFunction));
 
             INeuron[][] hiddenLayers = new INeuron[hiddenLayersNeuronsCount.Length][];
             INeuron[] previousLayer = inputLayer;
