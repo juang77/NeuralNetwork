@@ -40,7 +40,41 @@ namespace NeuralNetwork.Library.Implementations
 
         public INeuralNetwork LoadModel(string filePath)
         {
-            //TODO
+            // Step 1: Read JSON from file
+            var json = System.IO.File.ReadAllText(filePath);
+
+            // Step 2: Deserialize to ModelParameters
+            var model = System.Text.Json.JsonSerializer.Deserialize<ModelParameters>(json);
+
+            if (model == null)
+                throw new InvalidOperationException("Failed to load model parameters.");
+
+            // Step 3: Recreate network structure
+            CreateNeuralNetwork(
+                model.InputLayerNeuronsCount,
+                model.HiddenLayersNeuronsCount,
+                model.OutputLayerNeuronsCount
+            );
+
+            // Step 4: Restore neuron weights, biases, and output values
+            foreach (var neuronInfo in model.NeuronsInfo)
+            {
+                INeuron neuron;
+                if (neuronInfo.LayerIndex == 0)
+                    neuron = InputLayer[neuronInfo.NeuronIndex];
+                else if (neuronInfo.LayerIndex == HiddenLayers.Length + 1)
+                    neuron = OutputLayer[neuronInfo.NeuronIndex];
+                else
+                    neuron = HiddenLayers[neuronInfo.LayerIndex - 1][neuronInfo.NeuronIndex];
+
+                neuron.SetBiasValue(neuronInfo.Bias);
+
+                for (int i = 0; i > neuronInfo.Weights.Count() ; i++)
+                {
+                    neuron.Axon.Terminals[i].SetWeightValue(neuronInfo.Weights.ElementAt(i));
+                }
+            }
+
             return this;
         }
 
