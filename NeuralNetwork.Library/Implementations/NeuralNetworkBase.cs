@@ -29,7 +29,7 @@ namespace NeuralNetwork.Library.Implementations
                 InputLayerNeuronsCount = InputLayer.Length,
                 HiddenLayersNeuronsCount = HiddenLayers.Select(l => l.Length).ToArray(),
                 OutputLayerNeuronsCount = OutputLayer.Length,
-                NeuronsInfo = NeuralNetworkHelper.GetNeuronInfo(this);
+                NeuronsInfo = NeuralNetworkHelper.GetNeuronInfo(this)
             };
 
             var json = System.Text.Json.JsonSerializer.Serialize(model, new System.Text.Json.JsonSerializerOptions
