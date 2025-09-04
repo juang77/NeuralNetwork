@@ -13,5 +13,10 @@ namespace NeuralNetwork.Library.Activation_Function
         {
             return input > 0 ? input : _alpha * input;
         }
+
+        public double CalculateDerivative(double input)
+        {
+            return input > 0 ? 1 : _alpha;
+        }
     }
 }

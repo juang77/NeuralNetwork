@@ -8,5 +8,10 @@ namespace NeuralNetwork.Library.Activation_Function
         {
             return Math.Max(0, input);
         }
+
+        public double CalculateDerivative(double input)
+        {
+            return input > 0 ? 1 : 0;
+        }
     }
 }

@@ -10,6 +10,8 @@ public interface INeuron
 
     double Bias { get; }
 
+    double Delta { get; set; }
+
     void SetBiasValue(double value);
 
     void AddDendrite(ISynapse dendrite);

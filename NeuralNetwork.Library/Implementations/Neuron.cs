@@ -14,6 +14,8 @@ namespace NeuralNetwork.Library.Implementations
 
         public double Bias { get; private set; }
 
+        public double Delta { get; set; }
+
         public IInputFunction InputFunction => inputFunction;
 
         public IActivationFunction Activationfunction() => activationFunction;

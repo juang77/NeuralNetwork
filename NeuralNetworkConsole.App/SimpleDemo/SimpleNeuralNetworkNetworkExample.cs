@@ -9,7 +9,21 @@ namespace NeuralNetworkConsole.App.SimpleDemo
             INeuralNetwork neuralNetwork = new SimpleNeuralNetwork();
             var output = neuralNetwork.Predict([1,2]);
             WriteNeuronsInfo(neuralNetwork);
+            var probabilities = SoftMax(output);
+            foreach (var p in probabilities)
+            {
+                Console.WriteLine($"Probability: {p:f4}");
+            }
         }
+
+        public static double[] SoftMax(double[] Outputs)
+        {
+            var expValues = Outputs.Select(v => Math.Exp(v));
+            var sumExpValues = expValues.Sum();
+            var probabilities = expValues.Select(v => v / sumExpValues);
+            return probabilities.ToArray();
+        }
+
 
         public static void WriteNeuronsInfo(INeuralNetwork neuralNetwork)
         { 
