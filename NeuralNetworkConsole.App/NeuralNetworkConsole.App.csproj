@@ -8,11 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CSV.Library\CSV.Library.csproj" />
     <ProjectReference Include="..\NeuralNetwork.Library\NeuralNetwork.Library.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="StudyCase\Assets\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="StudyCase\Assets\StudyData.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
