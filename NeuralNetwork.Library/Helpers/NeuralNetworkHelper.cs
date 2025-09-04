@@ -1,6 +1,5 @@
 ﻿using NeuralNetwork.Abstration;
 using NeuralNetwork.Library.Implementations;
-using System.Reflection.Emit;
 
 namespace NeuralNetwork.Library.Helpers
 {
@@ -71,26 +70,26 @@ namespace NeuralNetwork.Library.Helpers
 
             INeuron[] NewLayer = new INeuron[neuronsCount];
 
-            Random rand = new Random();
-
             for (int i = 0; i < neuronsCount; i++)
             {
                 NewLayer[i] = new Neuron(inputFunction, activationFunction);
 
-                Synapse Synapse;
-
-                // Connect to previous layer
-                foreach (INeuron prevNeuron in previousLayer)
-                {
-                   foreach (INeuron postNeuron in NewLayer)
-                   {
-                        Synapse = new Synapse();
-                        prevNeuron.AddTerminal(Synapse);
-                        postNeuron.AddDendrite(Synapse);
-                    }
-                }
-
             }
+
+            Synapse Synapse;
+
+            // Connect to previous layer
+            foreach (INeuron prevNeuron in previousLayer)
+            {
+               foreach (var postNeuron in NewLayer)
+               {
+                    Synapse = new Synapse();
+                    prevNeuron.AddTerminal(Synapse);
+                    postNeuron.AddDendrite(Synapse);
+               }
+            }
+
+            
             return NewLayer;
         }
 
@@ -119,10 +118,7 @@ namespace NeuralNetwork.Library.Helpers
                 throw new ArgumentOutOfRangeException(nameof(neuronsCount), "The number of neurons must be greater than zero.");
             if (previousLayer == null || previousLayer.Length == 0)
                 throw new ArgumentNullException(nameof(previousLayer), "The previous layer must not be null or empty.");
-            if (inputFunction == null)
-                throw new ArgumentNullException(nameof(inputFunction));
-            if (activationFunction == null)
-                throw new ArgumentNullException(nameof(activationFunction));
+
 
             INeuron[] outputLayer = new INeuron[neuronsCount];
 
