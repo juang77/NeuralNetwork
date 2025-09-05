@@ -14,7 +14,7 @@ namespace NeuralNetworkConsole.App.StudyCase
             double[][] trainingTargets = ExtractTargets(TrainingData);
 
             int epochs = 1000;
-            double learningRate = 0.01;
+            double learningRate = 0.025;
 
             // Create an instance of StudyCaseNeuralNetwork before calling Train
             var neuralNetwork = new StudyCaseNeuralNetwork();
@@ -22,20 +22,26 @@ namespace NeuralNetworkConsole.App.StudyCase
 
             Console.WriteLine("Training complete. Testing the network:");
 
-            (double[] Data, int Expected)[] SampleData =
-                [
-                    ([0.4035,0.7300], 1),
-                    ([0.4035,0.650], 0),
-                    ([0.523,0.712], 1),
-                    ([0.622,0.435], 0),
-                    ([0.347,0.617], 0),
-                    ([0.459,0.745], 1),
-                    ([0.359,0.659], 0),
-                    ([0.712,0.523], 0),
-                    ([0.435,0.655], 0),
-                    ([0.959,0.959], 1),
-                    ([0.459,0.730], 1)
-                ];
+            //(double[] Data, int Expected)[] SampleData =
+            //    [
+            //        ([0.4035,0.7300], 1),
+            //        ([0.4035,0.650], 0),
+            //        ([0.523,0.712], 1),
+            //        ([0.622,0.435], 0),
+            //        ([0.347,0.617], 0),
+            //        ([0.459,0.745], 1),
+            //        ([0.359,0.659], 0),
+            //        ([0.712,0.523], 0),
+            //        ([0.435,0.655], 0),
+            //        ([0.959,0.959], 1),
+            //        ([0.459,0.730], 1)
+            //    ];
+
+            // Generate SampleData from TestData
+            var SampleData = TestData
+                .Select(d => (Data: new double[] { d.StudyHours, d.SleepingHours }, Expected: d.Expected))
+                .ToArray();
+
 
             foreach (var item in SampleData)
             {
