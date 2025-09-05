@@ -3,6 +3,7 @@ using NeuralNetwork.Library.Activation_Function;
 using NeuralNetwork.Library.Implementations;
 using NeuralNetwork.Library.Initializers;
 using NeuralNetwork.Library.Trainers;
+using System.Net;
 
 namespace NeuralNetworkConsole.App.StudyCase;
 
@@ -10,7 +11,7 @@ public class StudyCaseNeuralNetwork : NeuralNetworkBase, INeuralNetwork
 {
     public StudyCaseNeuralNetwork()
     {
-        HiddenLayerActivationFunction = new SigmoidActivationfunction();
+        HiddenLayerActivationFunction = new HyperbolicTangentActivationFunction();
         OutputLayerActivationFunction = new SigmoidActivationfunction();
         CreateNeuralNetwork(2, [8], 1);
     }

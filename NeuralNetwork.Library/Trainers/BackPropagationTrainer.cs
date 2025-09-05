@@ -8,57 +8,77 @@ namespace NeuralNetwork.Library.Trainers
         {
             // Forward pass
             double[] outputs = predictDelegate(inputs);
-            // Calculate loss (Mean Squared Error)
+
             double loss = 0.0;
+
+            // ======== Capa de salida ========
             for (int i = 0; i < network.OutputLayer.Length; i++)
             {
                 INeuron neuron = network.OutputLayer[i];
-                double Error = neuron.OutputValue - target[i];
-                double Delta = Error * neuron.Activationfunction().CalculateDerivative(neuron.OutputValue);
-                neuron.Delta = Delta;
+                double o = neuron.OutputValue;
+                double y = target[i];
 
-                neuron.SetBiasValue(neuron.Bias - learningRate * Delta);
+                // Gradiente con BCE simplificado
+                double delta = o - y;
+                neuron.Delta = delta;
 
-                loss += Error * Error;
+                // Actualizar bias
+                neuron.SetBiasValue(neuron.Bias - learningRate * delta);
 
+                // Pérdida con Binary Cross-Entropy
+                // Evitamos log(0) con epsilon
+                double epsilon = 1e-15;
+                loss += -(y * Math.Log(o + epsilon) + (1 - y) * Math.Log(1 - o + epsilon));
+
+                // Actualizar pesos desde última capa oculta
                 for (int j = 0; j < network.HiddenLayers.Last().Length; j++)
                 {
                     INeuron hiddenNeuron = network.HiddenLayers.Last()[j];
                     double currentWeight = hiddenNeuron.Axon.Terminals[i].Weight;
-                    double weightGradient = currentWeight - learningRate * Delta * hiddenNeuron.OutputValue;
-                    hiddenNeuron.Axon.Terminals[i].SetWeightValue(weightGradient);
+                    double newWeight = currentWeight - (learningRate * delta * hiddenNeuron.OutputValue);
+                    hiddenNeuron.Axon.Terminals[i].SetWeightValue(newWeight);
                 }
             }
 
-            INeuron[] NextLayer = network.OutputLayer;
+            // ======== Capas ocultas (backprop) ========
+            INeuron[] nextLayer = network.OutputLayer;
             for (int layerIndex = network.HiddenLayers.Length - 1; layerIndex >= 0; layerIndex--)
             {
-                for (int NeuronIndex = 0; NeuronIndex < network.HiddenLayers[layerIndex].Length; NeuronIndex++)
+                for (int neuronIndex = 0; neuronIndex < network.HiddenLayers[layerIndex].Length; neuronIndex++)
                 {
-                    INeuron CurrentNeuron = network.HiddenLayers[layerIndex][NeuronIndex];
-                    double Error = 0.0;
-                    for (int NextNeuronIndex = 0; NextNeuronIndex < NextLayer.Length; NextNeuronIndex++)
+                    INeuron currentNeuron = network.HiddenLayers[layerIndex][neuronIndex];
+
+                    // Error acumulado de la siguiente capa
+                    double error = 0.0;
+                    for (int nextNeuronIndex = 0; nextNeuronIndex < nextLayer.Length; nextNeuronIndex++)
                     {
-                        Error += CurrentNeuron.Axon.Terminals[NextNeuronIndex].Weight * NextLayer[NextNeuronIndex].Delta;
+                        error += currentNeuron.Axon.Terminals[nextNeuronIndex].Weight * nextLayer[nextNeuronIndex].Delta;
                     }
 
-                    double Delta = Error * CurrentNeuron.Activationfunction().CalculateDerivative(CurrentNeuron.OutputValue);
-                    CurrentNeuron.Delta = Delta;
-                    CurrentNeuron.SetBiasValue(CurrentNeuron.Bias - learningRate * Delta);
+                    // Delta con derivada de activación
+                    double delta = error * currentNeuron.Activationfunction().CalculateDerivative(currentNeuron.OutputValue);
+                    currentNeuron.Delta = delta;
 
-                    INeuron[] PreviousLayer = layerIndex == 0 ? network.InputLayer : network.HiddenLayers[layerIndex - 1];
+                    // Actualizar bias
+                    currentNeuron.SetBiasValue(currentNeuron.Bias - learningRate * delta);
 
-                    for (int PrevNeuronIndex = 0; PrevNeuronIndex < PreviousLayer.Length; PrevNeuronIndex++)
+                    // Pesos desde la capa anterior
+                    INeuron[] previousLayer = layerIndex == 0 ? network.InputLayer : network.HiddenLayers[layerIndex - 1];
+
+                    for (int prevNeuronIndex = 0; prevNeuronIndex < previousLayer.Length; prevNeuronIndex++)
                     {
-                        INeuron previousNeuron = PreviousLayer[PrevNeuronIndex];
-                        double currentWeight = previousNeuron.Axon.Terminals[NeuronIndex].Weight;
-                        double weightGradient = currentWeight - learningRate * Delta * previousNeuron.OutputValue;
-                        previousNeuron.Axon.Terminals[NeuronIndex].SetWeightValue(weightGradient);
+                        INeuron previousNeuron = previousLayer[prevNeuronIndex];
+                        double currentWeight = previousNeuron.Axon.Terminals[neuronIndex].Weight;
+                        double newWeight = currentWeight - (learningRate * delta * previousNeuron.OutputValue);
+                        previousNeuron.Axon.Terminals[neuronIndex].SetWeightValue(newWeight);
                     }
                 }
-                NextLayer = network.HiddenLayers[layerIndex];
+
+                nextLayer = network.HiddenLayers[layerIndex];
             }
-            return loss / network.OutputLayer.Length;
+
+            // Devolvemos la pérdida total (BCE) para esta muestra
+            return loss;
         }
     }
 }

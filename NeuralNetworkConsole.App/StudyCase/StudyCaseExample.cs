@@ -14,7 +14,7 @@ namespace NeuralNetworkConsole.App.StudyCase
             double[][] trainingTargets = ExtractTargets(TrainingData);
 
             int epochs = 1000;
-            double learningRate = 0.25;
+            double learningRate = 0.01;
 
             // Create an instance of StudyCaseNeuralNetwork before calling Train
             var neuralNetwork = new StudyCaseNeuralNetwork();
