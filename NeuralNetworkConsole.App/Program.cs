@@ -1,5 +1,4 @@
 ﻿using NeuralNetworkConsole.App.SimpleDemo;
-using NeuralNetworkConsole.App.StudyCase;
 
 namespace NeuralNetworkConsole.App
 {
@@ -7,8 +6,7 @@ namespace NeuralNetworkConsole.App
     {
         static void Main(string[] args)
         {
-            //SimpleNeuralNetworkNetworkExample.DoExample();
-            StudyCaseExample.ExecuteExample();
+            SimpleNeuralNetworkNetworkExample.DoExample();
         }
     }
 }

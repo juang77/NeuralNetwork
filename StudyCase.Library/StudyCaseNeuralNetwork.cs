@@ -3,12 +3,15 @@ using NeuralNetwork.Library.Activation_Function;
 using NeuralNetwork.Library.Implementations;
 using NeuralNetwork.Library.Initializers;
 using NeuralNetwork.Library.Trainers;
-using System.Net;
+using StudyCase.Library.Models;
 
-namespace NeuralNetworkConsole.App.StudyCase;
+namespace StudyCase.Library;
 
 public class StudyCaseNeuralNetwork : NeuralNetworkBase, INeuralNetwork
 {
+    public event Action<OnTrainingEventArgs>? OnTrainingEvent;
+    public event Action<int, double[]> OnPredictionEvent;
+
     public StudyCaseNeuralNetwork()
     {
         HiddenLayerActivationFunction = new HyperbolicTangentActivationFunction();
@@ -39,11 +42,17 @@ public class StudyCaseNeuralNetwork : NeuralNetworkBase, INeuralNetwork
             double TotalLoss = 0.0;
             for (int i = 0; i < trainingData.Length; i++)
             {
-                TotalLoss += BackPropagationTrainer.ApplyBackPropagation(this, trainingData[i], targets[i], learningRate, Predict);
+                //Forward propagation
+                double[] outputs = Predict(trainingData[i]);
+                OnPredictionEvent?.Invoke(i, outputs);
+
+                //apply backpropagation
+                TotalLoss += BackPropagationTrainer.ApplyBackPropagation(this, trainingData[i], targets[i], learningRate);
             }
 
             double Mse = TotalLoss / trainingData.Length;
-            Console.WriteLine($"Epoch {epoch + 1} / {epoch} - Loss(Mse): {Mse:f6}");
+
+            OnTrainingEvent?.Invoke(new OnTrainingEventArgs(epochs, epoch + 1, Mse));
         }
     }
 }

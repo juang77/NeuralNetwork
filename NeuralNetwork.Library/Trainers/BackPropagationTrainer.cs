@@ -4,33 +4,30 @@ namespace NeuralNetwork.Library.Trainers
 {
     public static class BackPropagationTrainer
     {
-        public static double ApplyBackPropagation(INeuralNetwork network, double[] inputs, double[] target, double learningRate, Func<double[], double[]> predictDelegate)
+        public static double ApplyBackPropagation(INeuralNetwork network, double[] inputs, double[] target, double learningRate)
         {
-            // Forward pass
-            double[] outputs = predictDelegate(inputs);
-
             double loss = 0.0;
 
-            // ======== Capa de salida ========
+            // ======== Output Layer ========
             for (int i = 0; i < network.OutputLayer.Length; i++)
             {
                 INeuron neuron = network.OutputLayer[i];
                 double o = neuron.OutputValue;
                 double y = target[i];
 
-                // Gradiente con BCE simplificado
+                // Simplified gradient with BCE
                 double delta = o - y;
                 neuron.Delta = delta;
 
-                // Actualizar bias
+                // Update bias
                 neuron.SetBiasValue(neuron.Bias - learningRate * delta);
 
-                // Pérdida con Binary Cross-Entropy
-                // Evitamos log(0) con epsilon
+                // Loss with Binary Cross-Entropy
+                // Avoid log(0) using epsilon
                 double epsilon = 1e-15;
                 loss += -(y * Math.Log(o + epsilon) + (1 - y) * Math.Log(1 - o + epsilon));
 
-                // Actualizar pesos desde última capa oculta
+                // Update weights from last hidden layer
                 for (int j = 0; j < network.HiddenLayers.Last().Length; j++)
                 {
                     INeuron hiddenNeuron = network.HiddenLayers.Last()[j];
@@ -40,7 +37,7 @@ namespace NeuralNetwork.Library.Trainers
                 }
             }
 
-            // ======== Capas ocultas (backprop) ========
+            // ======== Hidden layers (backprop) ========
             INeuron[] nextLayer = network.OutputLayer;
             for (int layerIndex = network.HiddenLayers.Length - 1; layerIndex >= 0; layerIndex--)
             {
@@ -48,21 +45,21 @@ namespace NeuralNetwork.Library.Trainers
                 {
                     INeuron currentNeuron = network.HiddenLayers[layerIndex][neuronIndex];
 
-                    // Error acumulado de la siguiente capa
+                    // Accumulated error from the next layer
                     double error = 0.0;
                     for (int nextNeuronIndex = 0; nextNeuronIndex < nextLayer.Length; nextNeuronIndex++)
                     {
                         error += currentNeuron.Axon.Terminals[nextNeuronIndex].Weight * nextLayer[nextNeuronIndex].Delta;
                     }
 
-                    // Delta con derivada de activación
+                    // Delta with activation derivative
                     double delta = error * currentNeuron.Activationfunction().CalculateDerivative(currentNeuron.OutputValue);
                     currentNeuron.Delta = delta;
 
-                    // Actualizar bias
+                    // Update bias
                     currentNeuron.SetBiasValue(currentNeuron.Bias - learningRate * delta);
 
-                    // Pesos desde la capa anterior
+                    // Weights from the previous layer
                     INeuron[] previousLayer = layerIndex == 0 ? network.InputLayer : network.HiddenLayers[layerIndex - 1];
 
                     for (int prevNeuronIndex = 0; prevNeuronIndex < previousLayer.Length; prevNeuronIndex++)
@@ -77,7 +74,7 @@ namespace NeuralNetwork.Library.Trainers
                 nextLayer = network.HiddenLayers[layerIndex];
             }
 
-            // Devolvemos la pérdida total (BCE) para esta muestra
+            // Return total loss (BCE) for this sample
             return loss;
         }
     }

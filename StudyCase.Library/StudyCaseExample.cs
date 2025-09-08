@@ -1,16 +1,27 @@
 ﻿using CSV.Library;
-using NeuralNetworkConsole.App.Model;
+using StudyCase.Library.Models;
 
-namespace NeuralNetworkConsole.App.StudyCase
+
+
+namespace StudyCase.Library
 {
-    public static class StudyCaseExample
+    public class StudyCaseExample
     {
-        public static void ExecuteExample()
+        public event Action<OnTrainingEventArgs>? OnTrainingEvent;
+        public event Action<int, double[]> OnPredictionEvent;
+        public event Action<double[][]> OnGetTrainingDataEvent;
+
+        public void ExecuteExample()
         {
             var Data = GetFileData();
 
             (var TrainingData, var TestData) = GetTrainAndTestData(Data);
+            
             double[][] trainingInputs = ExtractInputs(TrainingData);
+
+            // Raise event with training data
+            OnGetTrainingDataEvent?.Invoke(trainingInputs);
+
             double[][] trainingTargets = ExtractTargets(TrainingData);
 
             int epochs = 1000;
@@ -18,6 +29,11 @@ namespace NeuralNetworkConsole.App.StudyCase
 
             // Create an instance of StudyCaseNeuralNetwork before calling Train
             var neuralNetwork = new StudyCaseNeuralNetwork();
+
+            // Subscribe to neural network events if available
+            neuralNetwork.OnTrainingEvent += OnTrainingEvent;
+            neuralNetwork.OnPredictionEvent += OnPredictionEvent;
+
             neuralNetwork.Train(trainingInputs, trainingTargets, epochs, learningRate);
 
             Console.WriteLine("Training complete. Testing the network:");
@@ -37,19 +53,19 @@ namespace NeuralNetworkConsole.App.StudyCase
             //        ([0.459,0.730], 1)
             //    ];
 
-            // Generate SampleData from TestData
-            var SampleData = TestData
-                .Select(d => (Data: new double[] { d.StudyHours, d.SleepingHours }, Expected: d.Expected))
-                .ToArray();
+            //// Generate SampleData from TestData
+            //var SampleData = TestData
+            //    .Select(d => (Data: new double[] { d.StudyHours, d.SleepingHours }, Expected: d.Expected))
+            //    .ToArray();
 
 
-            foreach (var item in SampleData)
-            {
-                Console.Write($"[{string.Join(",", item.Data)}], Expected/Predicted:");
-                Console.Write($"{item.Expected},");
-                var Predicted = neuralNetwork.Predict(item.Data)[0];
-                Console.WriteLine($"{(Predicted >= 0.5 ? 1 : 0)} ({Predicted})");
-            }
+            //foreach (var item in SampleData)
+            //{
+            //    Console.Write($"[{string.Join(",", item.Data)}], Expected/Predicted:");
+            //    Console.Write($"{item.Expected},");
+            //    var Predicted = neuralNetwork.Predict(item.Data)[0];
+            //    Console.WriteLine($"{(Predicted >= 0.5 ? 1 : 0)} ({Predicted})");
+            //}
         }
 
         private static double[][] ExtractTargets(IEnumerable<StudyData> trainingData)
@@ -81,7 +97,7 @@ namespace NeuralNetworkConsole.App.StudyCase
 
         static StudyData[] GetFileData()
         {
-            var DataPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "StudyCase\\Assets", "StudyData.csv");
+            var DataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "StudyData.csv");
             var Data = CsvReader.Read(DataPath, true);
             // Assuming CsvReader.Read returns a collection of rows, map them to StudyData[]
             return Data.Select(row => new StudyData(
